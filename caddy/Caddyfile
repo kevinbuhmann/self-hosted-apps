@@ -1,0 +1,3 @@
+http://paperless.home.arpa {
+  reverse_proxy paperless:8000
+}
