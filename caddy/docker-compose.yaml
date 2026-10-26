@@ -1,0 +1,16 @@
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - reverse-proxy
+    volumes:
+      - /srv/apps/caddy/data:/data
+      - /srv/apps/caddy/config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+networks:
+  reverse-proxy:
+    external: true
