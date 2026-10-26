@@ -1,0 +1,59 @@
+services:
+  broker:
+    image: valkey/valkey:9
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - /srv/apps/paperless-ngx/valkey_data:/data
+
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - /srv/apps/paperless-ngx/postgres_data:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  paperless:
+    image: paperlessngx/paperless-ngx:3.3
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+    networks:
+      - internal
+      - reverse-proxy
+    volumes:
+      - /srv/apps/paperless-ngx/paperless_data:/usr/src/paperless/data
+      - /srv/apps/paperless-ngx/paperless_media:/usr/src/paperless/media
+      - /srv/apps/paperless-ngx/paperless_export:/usr/src/paperless/export
+      - /srv/apps/paperless-ngx/paperless_consume:/usr/src/paperless/consume
+    environment:
+      # broker
+      PAPERLESS_REDIS: redis://broker:6379
+      # database
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBNAME: ${POSTGRES_DB}
+      PAPERLESS_DBUSER: ${POSTGRES_USER}
+      PAPERLESS_DBPASSWORD: ${POSTGRES_PASSWORD}
+      # sign in / session security
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
+      # date time settings
+      PAPERLESS_TIME_ZONE: America/Chicago
+      PAPERLESS_DATE_ORDER: MDY
+      # OCR settings
+      PAPERLESS_OCR_LANGUAGE: eng
+      PAPERLESS_OCR_CLEAN: clean-final
+      # consumer settings
+      PAPERLESS_CONSUMER_DELETE_DUPLICATES: true
+
+networks:
+  internal:
+  reverse-proxy:
+    external: true
