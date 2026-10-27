@@ -1,0 +1,5 @@
+# no tls certificates to backup
+/srv/apps/caddy
+
+# use database backup (via pg_dump in pre-backup hook) instead of live database files
+/srv/apps/paperless-ngx/postgres_data
