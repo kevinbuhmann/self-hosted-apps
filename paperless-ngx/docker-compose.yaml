@@ -53,6 +53,42 @@ services:
       # consumer settings
       PAPERLESS_CONSUMER_DELETE_DUPLICATES: true
 
+  ################################################################################
+  ################################# Backup Hooks #################################
+  ################################################################################
+
+  pre-backup:
+    image: postgres:18
+    profiles: ["backup"]
+    depends_on:
+      - db
+    networks:
+      - internal
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - /srv/apps/paperless-ngx/postgres_backup:/target
+    command: pg_dump --format=tar --file=/target/paperless_db.tar
+
+  post-restore:
+    image: postgres:18
+    profiles: ["restore"]
+    depends_on:
+      - db
+    networks:
+      - internal
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - /srv/apps/paperless-ngx/postgres_backup:/target
+    command: pg_restore --clean --if-exists --exit-on-error --dbname=${POSTGRES_DB} --format=tar /target/paperless_db.tar
+
 networks:
   internal:
   reverse-proxy:
