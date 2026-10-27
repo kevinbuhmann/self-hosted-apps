@@ -1,0 +1,12 @@
+services:
+  grist:
+    image: gristlabs/grist:1
+    restart: unless-stopped
+    networks:
+      - reverse-proxy
+    volumes:
+      - /srv/apps/grist/persist:/persist
+
+networks:
+  reverse-proxy:
+    external: true

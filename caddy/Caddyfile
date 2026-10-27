@@ -1,3 +1,7 @@
+http://grist.home.arpa {
+  reverse_proxy grist:8484
+}
+
 http://paperless.home.arpa {
   reverse_proxy paperless:8000
 }
