@@ -18,6 +18,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --host=db --port=5432"]
+      interval: 1s
+      timeout: 10s
+      retries: 15
 
   paperless:
     image: paperlessngx/paperless-ngx:3.3
@@ -61,7 +66,8 @@ services:
     image: postgres:18
     profiles: ["backup"]
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - internal
     environment:
@@ -77,7 +83,8 @@ services:
     image: postgres:18
     profiles: ["restore"]
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - internal
     environment:
