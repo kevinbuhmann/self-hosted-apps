@@ -1,0 +1,29 @@
+services:
+  opencloud:
+    image: opencloudeu/opencloud-rolling:9
+    restart: unless-stopped
+    user: 1000:1000
+    networks:
+      - reverse-proxy
+    volumes:
+      - /srv/apps/opencloud/opencloud_config:/etc/opencloud
+      - /srv/apps/opencloud/opencloud_data:/var/lib/opencloud
+    environment:
+      OC_URL: https://cloud.home.arpa
+      OC_INSECURE: true # self-signed certificate
+      PROXY_TLS: false
+
+  opencloud-init:
+    image: opencloudeu/opencloud-rolling:9
+    user: "0:0" # run as root to fix host permissions
+    volumes:
+      - /srv/apps/opencloud/opencloud_config:/etc/opencloud
+      - /srv/apps/opencloud/opencloud_data:/var/lib/opencloud
+      - ./scripts/opencloud-init.sh:/scripts/opencloud-init.sh:ro
+    environment:
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
+    entrypoint: ["/bin/sh", "/scripts/opencloud-init.sh"]
+
+networks:
+  reverse-proxy:
+    external: true
