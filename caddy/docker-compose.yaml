@@ -10,6 +10,9 @@ services:
       - /srv/apps/caddy/data:/data
       - /srv/apps/caddy/config:/config
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    environment:
+      - GRIST_EMAIL_ADDRESS=${GRIST_EMAIL_ADDRESS}
+      - GRIST_PASSWORD_HASH=${GRIST_PASSWORD_HASH}
 
 networks:
   reverse-proxy:

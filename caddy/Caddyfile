@@ -1,4 +1,15 @@
 http://grist.home.arpa {
+  handle /auth/login* {
+    basic_auth {
+      {$GRIST_EMAIL_ADDRESS} {$GRIST_PASSWORD_HASH}
+    }
+
+    reverse_proxy grist:8484 {
+      header_up X-Forwarded-User {$GRIST_EMAIL_ADDRESS}
+      header_up -Authorization
+    }
+  }
+
   reverse_proxy grist:8484
 }
 

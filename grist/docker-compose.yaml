@@ -6,6 +6,15 @@ services:
       - reverse-proxy
     volumes:
       - /srv/apps/grist/persist:/persist
+    environment:
+      - APP_HOME_URL=http://grist.home.arpa
+      - GRIST_BOOT_KEY=${GRIST_BOOT_KEY}
+      - GRIST_SINGLE_ORG=grist
+      - GRIST_FORCE_LOGIN=true
+      - GRIST_SUPPORT_ANON=false
+      - GRIST_ANON_PLAYGROUND=false
+      - GRIST_FORWARD_AUTH_HEADER=X-Forwarded-User
+      - GRIST_FORWARD_AUTH_LOGOUT_PATH=/signed-out
 
 networks:
   reverse-proxy:
