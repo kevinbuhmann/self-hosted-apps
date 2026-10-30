@@ -4,12 +4,33 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - reverse-proxy
     volumes:
       - /srv/apps/caddy/data:/data
       - /srv/apps/caddy/config:/config
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+  ################################################################################
+  ################################# Backup Hooks #################################
+  ################################################################################
+
+  pre-backup:
+    image: alpine:latest
+    profiles: ["backup"]
+    volumes:
+      - /srv/apps/caddy/data:/data
+      - /srv/apps/caddy/data-backup:/data-backup
+    command: tar --create --verbose --file /data-backup/caddy-data.tar --exclude locks --directory /data .
+
+  post-restore:
+    image: alpine:latest
+    profiles: ["restore"]
+    volumes:
+      - /srv/apps/caddy/data:/data
+      - /srv/apps/caddy/data-backup:/data-backup
+    command: tar --extract --verbose --file /data-backup/caddy-data.tar --directory /data
 
 networks:
   reverse-proxy:
