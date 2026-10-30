@@ -13,6 +13,10 @@ External configuration:
 
 Purpose: document storage.
 
+### OpenCloud
+
+Purpose: general files.
+
 ## Management scripts
 
 ### compose-all.sh
