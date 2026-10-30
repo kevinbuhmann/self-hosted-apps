@@ -1,3 +1,4 @@
-http://paperless.home.arpa {
+paperless.home.arpa {
+  tls internal
   reverse_proxy paperless:8000
 }

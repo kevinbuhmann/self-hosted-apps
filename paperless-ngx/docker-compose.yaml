@@ -47,6 +47,9 @@ services:
       PAPERLESS_DBNAME: ${POSTGRES_DB}
       PAPERLESS_DBUSER: ${POSTGRES_USER}
       PAPERLESS_DBPASSWORD: ${POSTGRES_PASSWORD}
+      # hosts
+      PAPERLESS_URL: https://paperless.home.arpa
+      PAPERLESS_USE_X_FORWARDED_PROTO: true
       # sign in / session security
       PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
       # date time settings
