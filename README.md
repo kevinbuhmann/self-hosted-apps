@@ -51,6 +51,6 @@ Prerequisites:
 
 Script actions:
 1. Creates `/srv/apps` and sets owner if it doesn't exist.
-2. Creates the `reverse-proxy` docker network if it doesn't exist.
+2. Creates the `apps-reverse-proxy` docker network if it doesn't exist.
 2. Runs `restic restore latest` from `/backup/apps-backup` using `/backup/restic-password.txt`.
 3. Runs `post-restore` services under the `restore` profile (e.g. to restore database from backups).
