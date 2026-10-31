@@ -17,6 +17,7 @@ services:
   opencloud-init:
     image: opencloudeu/opencloud-rolling:latest
     user: "0:0" # run as root to fix host permissions
+    network_mode: none
     volumes:
       - /srv/apps/opencloud/opencloud_config:/etc/opencloud
       - /srv/apps/opencloud/opencloud_data:/var/lib/opencloud
@@ -27,5 +28,7 @@ services:
 
 networks:
   internal:
+    internal: true
   reverse-proxy:
     external: true
+    name: apps-reverse-proxy

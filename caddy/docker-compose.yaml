@@ -3,14 +3,21 @@ services:
     image: caddy:2
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "${HOST_LAN_IP_ADDRESS}:80:80"
+      - "${HOST_LAN_IP_ADDRESS}:443:443"
     networks:
-      - reverse-proxy
+      internet:
+      reverse-proxy:
+        aliases:
+          - cloud.${HOST_DOMAIN}
+          - paperless.${HOST_DOMAIN}
     volumes:
       - /srv/apps/caddy/data:/data
       - /srv/apps/caddy/config:/config
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    environment:
+      - HOST_DOMAIN=${HOST_DOMAIN:-home.arpa}
+      - HOST_LAN_IP_ADDRESS=${HOST_LAN_IP_ADDRESS:-0.0.0.0}
 
   ################################################################################
   ################################# Backup Hooks #################################
@@ -33,5 +40,7 @@ services:
     command: tar --extract --verbose --file /data-backup/caddy-data.tar --directory /data
 
 networks:
+  internet:
   reverse-proxy:
     external: true
+    name: apps-reverse-proxy

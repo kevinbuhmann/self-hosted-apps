@@ -101,5 +101,7 @@ services:
 
 networks:
   internal:
+    internal: true
   reverse-proxy:
     external: true
+    name: apps-reverse-proxy

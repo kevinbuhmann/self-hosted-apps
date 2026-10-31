@@ -13,7 +13,7 @@ sudo setfacl -R -m u:"$USER":rwx /srv/apps # set ACL for the current user recurs
 sudo setfacl -dR -m u:"$USER":rwx /srv/apps # set default ACL for the current user recursively
 
 # Create the reverse proxy docker network if it doesn't exist.
-docker network create reverse-proxy || true
+docker network create apps-reverse-proxy --internal || true
 
 # Perform the restore using restic.
 restore_command=(

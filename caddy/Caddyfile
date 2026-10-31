@@ -1,9 +1,9 @@
-cloud.home.arpa {
+cloud.{$HOST_DOMAIN} {
   tls internal
   reverse_proxy opencloud:9200
 }
 
-paperless.home.arpa {
+paperless.{$HOST_DOMAIN} {
   tls internal
   reverse_proxy paperless:8000
 }
