@@ -1,0 +1,35 @@
+services:
+  restic-backup:
+    build: .
+    profiles: ["backup"]
+    volumes:
+      # mount source directories as read only
+      - /opt/apps:/opt/apps:ro
+      - /srv/apps:/srv/apps:ro
+      # mount restic repository and related files
+      - ${RESTIC_REPO}:/restic-repo
+      - ${RESTIC_PASSWORD_FILE}:/restic-password.txt:ro
+      - ./restic-exclude.txt:/restic-exclude.txt:ro
+      # mount script
+      - ./scripts/restic-backup.sh:/scripts/restic-backup.sh:ro
+    environment:
+      - RESTIC_HOST=${RESTIC_HOST}
+    user: "${HOST_UID}:${HOST_GID}"
+    command: sh /scripts/restic-backup.sh
+
+  restic-restore:
+    build: .
+    profiles: ["restore"]
+    volumes:
+      # mount destination directories
+      - /opt/apps:/opt/apps
+      - /srv/apps:/srv/apps
+      # mount restic repository and related files
+      - ${RESTIC_REPO}:/restic-repo
+      - ${RESTIC_PASSWORD_FILE}:/restic-password.txt:ro
+      # mount script
+      - ./scripts/restic-restore.sh:/scripts/restic-restore.sh:ro
+    environment:
+      - RESTIC_HOST=${RESTIC_HOST}
+    user: "${HOST_UID}:${HOST_GID}"
+    command: sh /scripts/restic-restore.sh
