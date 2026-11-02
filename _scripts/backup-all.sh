@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Set user/group IDs for container user mapping.
+export HOST_UID="$(id -u)"
+export HOST_GID="$(id -g)"
 echo "Running backup as user: $USER"
+
+# Build the backup-restore container, exit upon failure.
+docker compose --file ./backup-restore/docker-compose.yaml --profile backup build
 
 # Run pre-backup hooks for all services before shutting them down (e.g. to run database backups).
 ./_scripts/run-service-all.sh pre-backup --profile backup
@@ -12,13 +18,7 @@ echo "Running backup as user: $USER"
 # Perform the backup using restic.
 echo
 backup_failed=0
-env RESTIC_PASSWORD_FILE=/backup/restic-password.txt restic -r /backup/apps-backup backup /opt/apps /srv/apps --exclude-file ./restic-exclude.txt || backup_failed=1
-
-if [ "$backup_failed" -eq 0 ]; then
-  echo -e "\e[32mBackup succeeded.\e[0m"
-else
-  echo -e "\e[31mBackup failed.\e[0m" >&2
-fi
+docker compose --file ./backup-restore/docker-compose.yaml --profile backup run --rm restic-backup || backup_failed=1
 
 # Bring all services back up after the backup is complete.
 ./_scripts/compose-all.sh up -d

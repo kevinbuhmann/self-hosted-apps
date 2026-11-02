@@ -31,8 +31,9 @@ fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-shopt -s nullglob
-docker_compose_files=("$ROOT_DIR"/*/docker-compose.yaml)
+mapfile -t docker_compose_files < <(
+  find "$ROOT_DIR" -mindepth 2 -maxdepth 2 -type f -name docker-compose.yaml ! -path "$ROOT_DIR/backup-restore/*" | sort
+)
 
 if [[ ${#docker_compose_files[@]} -eq 0 ]]; then
   echo "No docker-compose.yaml files found under: $ROOT_DIR"
