@@ -20,18 +20,15 @@ sudo setfacl -dR -m u:"$USER":rwx /srv/apps # set default ACL for the current us
 docker network create apps-reverse-proxy --internal || true
 
 # Perform the restore using restic.
-restore_command=(
-  env RESTIC_PASSWORD_FILE=/backup/restic-password.txt
-  restic -r /backup/apps-backup restore latest --target /
-)
+echo
+restore_failed=0
+env RESTIC_PASSWORD_FILE=/backup/restic-password.txt restic -r /backup/apps-backup restore latest --target / || restore_failed=1
 
-if "${restore_command[@]}"; then
-  echo
+if [ "$restore_failed" -eq 0 ]; then
   echo -e "\e[32mRestore succeeded.\e[0m"
 else
-  echo
   echo -e "\e[31mRestore failed.\e[0m" >&2
-  exit 1
+  exit "$restore_failed"
 fi
 
 # Run post-restore hooks for all services (e.g. to restore database from backups).
