@@ -17,18 +17,34 @@ docker compose --file ./backup-restore/docker-compose.yaml --profile backup buil
 
 # Perform the backup using restic.
 echo
-backup_failed=0
-docker compose --file ./backup-restore/docker-compose.yaml --profile backup run --rm restic-backup || backup_failed=1
+restic_backup_failed=0
+docker compose --file ./backup-restore/docker-compose.yaml --profile backup run --rm restic-backup || restic_backup_failed=1
 
-# Bring all services back up after the backup is complete.
-./_scripts/compose-all.sh up -d
+# Bring all services back up after the restic backup is complete, even if it failed.
+compose_up_failed=0
+./_scripts/compose-all.sh up -d || compose_up_failed=1
+
+# Run rclone backup after successful restic backup.
+rclone_backup_failed=0
+if [ "$restic_backup_failed" -eq 0 ]; then
+  echo
+  ./_scripts/run-rclone.sh backup || rclone_backup_failed=1
+fi
 
 # Report result.
 echo
-if [ "$backup_failed" -eq 0 ]; then
-  echo -e "\e[32mBackup succeeded and services are running.\e[0m"
+if [ "$restic_backup_failed" -ne 0 ]; then
+  echo -e "\e[31mThe restic backup failed.\e[0m" >&2
+elif [ "$rclone_backup_failed" -ne 0 ]; then
+  echo -e "\e[31mThe rclone backup failed.\e[0m" >&2
 else
-  echo -e "\e[31mServices are running, but the backup failed.\e[0m" >&2
+  echo -e "\e[32mBackup succeeded.\e[0m"
 fi
 
-exit "$backup_failed"
+if [ "$compose_up_failed" -ne 0 ]; then
+  echo -e "\e[31mFailed to bring services back up after backup.\e[0m" >&2
+else
+  echo -e "\e[32mServices are running.\e[0m"
+fi
+
+exit "$((restic_backup_failed || compose_up_failed ||rclone_backup_failed))"

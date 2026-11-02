@@ -33,3 +33,35 @@ services:
       - RESTIC_HOST=${RESTIC_HOST}
     user: "${HOST_UID}:${HOST_GID}"
     command: sh /scripts/restic-restore.sh
+
+  rclone-backup:
+    build: .
+    profiles: ["backup"]
+    volumes:
+      # mount restic repository as read only
+      - ${RESTIC_REPO}:/restic-repo:ro
+      # mount rclone config (need write access to save updated access tokens)
+      - ${RCLONE_CONFIG_FILE}:/rclone.conf
+      # mount script
+      - ./scripts/rclone-backup.sh:/scripts/rclone-backup.sh:ro
+    environment:
+      - RCLONE_TARGET=${RCLONE_TARGET}
+    user: "${HOST_UID}:${HOST_GID}"
+    command: sh /scripts/rclone-backup.sh
+
+  rclone-restore:
+    build: .
+    profiles: ["restore"]
+    volumes:
+      # mount destination restic repository
+      - ${RESTIC_REPO}:/restic-repo
+      # mount rclone config (need write access to save updated access tokens)
+      - ${RCLONE_CONFIG_FILE}:/rclone.conf
+      # mount script
+      - ./scripts/rclone-restore.sh:/scripts/rclone-restore.sh:ro
+    environment:
+      - HOST_UID=${HOST_UID}
+      - HOST_GID=${HOST_GID}
+      - RCLONE_TARGET=${RCLONE_TARGET}
+    user: "0:0" # run as root to be able to create the restic repo directory, script will change ownership of restored files to host user
+    command: sh /scripts/rclone-restore.sh

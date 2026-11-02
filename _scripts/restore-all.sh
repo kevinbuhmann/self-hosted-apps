@@ -6,7 +6,8 @@ set -euo pipefail
 
 # Prerequisite 2: Ensure that the backup files are available and the backup-restore/.env file is properly configured.
 # See the backup-restore/.env.template file and set the RESTIC_REPO and RESTIC_PASSWORD_FILE variables accordingly.
-# If the restic repo is not available locally, you will need to download it from the offsite backup location manually.
+# If the restic repo is not available locally, you will need to download it from the offsite backup location manually
+# or run `./_scripts/run-rclone.sh restore` (after satisfying the prerequisites stated in that script).
 
 # Set user/group IDs for container user mapping.
 export HOST_UID="$(id -u)"
