@@ -41,6 +41,7 @@ Script actions:
 2. Stops all apps.
 3. Runs `restic backup /opt/apps /srv/apps` to `RESTIC_REPO` using `RESTIC_PASSWORD_FILE` and `./backup-restore/restic-exclude.txt`.
 4. Starts all apps.
+5. Runs `rclone sync` using `RCLONE_CONFIG_FILE` and `RCLONE_TARGET` if restic backup was successful.
 
 ### restore-all.sh
 
@@ -50,9 +51,18 @@ Prerequisites:
 - Install `docker` and `docker compose`.
 - Install `git` and clone this repo to `/opt/apps`.
 - Ensure that the `./backup-restore/.env` file is properly configured.
+- Restore the off-site backup if needed using `./_scripts/run-rclone.sh restore`.
 
 Script actions:
 1. Creates `/srv/apps` and sets owner if it doesn't exist.
 2. Creates the `apps-reverse-proxy` docker network if it doesn't exist.
 3. Runs `restic restore latest` from `RESTIC_REPO` using `RESTIC_PASSWORD_FILE`.
 4. Runs `post-restore` services under the `restore` profile (e.g. to restore database from backups).
+
+### run-clone.sh
+
+Usage: `./_scripts/restore-all.sh <backup|restore`>
+
+Prerequistes:
+- Install `docker` and `docker compose`.
+- Ensure that the `./backup-restore/.env` file is properly configured.
