@@ -7,3 +7,8 @@ paperless.home.arpa {
   tls internal
   reverse_proxy paperless:8000
 }
+
+# The Obsidian Android app has a hard requirement for a publicly-trusted certificate if using TLS.
+http://obsidian-livesync-couchdb.home.arpa {
+  reverse_proxy obsidian-livesync-couchdb:5984
+}

@@ -13,6 +13,10 @@ External configuration:
 
 Purpose: document storage.
 
+### Obsidian LiveSync
+
+Purpose: sync Obsidian notes between devices
+
 ### OpenCloud
 
 Purpose: general files.

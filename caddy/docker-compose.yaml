@@ -11,6 +11,7 @@ services:
         aliases:
           - cloud.home.arpa
           - paperless.home.arpa
+          - obsidian-livesync-couchdb.home.arpa
     volumes:
       - /srv/apps/caddy/data:/data
       - /srv/apps/caddy/config:/config

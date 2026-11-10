@@ -1,0 +1,97 @@
+services:
+  obsidian-livesync-couchdb:
+    image: couchdb:3
+    restart: unless-stopped
+    networks:
+      - internal
+      - reverse-proxy
+    volumes:
+      - /srv/apps/obsidian-livesync/couchdb_data:/opt/couchdb/data
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      # force CouchDB to set up its internal shards for a standalone node
+      NODENAME: 127.0.0.1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up", "-u", "${COUCHDB_USER}:${COUCHDB_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  obsidian-livesync-couchdb-init:
+    image: curlimages/curl:latest
+    restart: on-failure
+    depends_on:
+      obsidian-livesync-couchdb:
+        condition: service_healthy
+    networks:
+      - internal
+    volumes:
+      - ./scripts/couchdb-init.sh:/scripts/couchdb-init.sh:ro
+    environment:
+      COUCHDB_INTERNAL_URL: http://obsidian-livesync-couchdb:5984
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCHDB_DATABASE: ${COUCHDB_DATABASE}
+    entrypoint: ["sh", "/scripts/couchdb-init.sh"]
+
+  ################################################################################
+  ################################# Backup Hooks #################################
+  ################################################################################
+
+  # Export the raw markdown files from CouchDB to a vault folder.
+  # This ensures that the vault can be recovered even if the encrypted sync database is corrupted or unusable.
+  pre-backup:
+    image: ghcr.io/vrtmrz/livesync-cli:latest
+    profiles: ["backup"]
+    depends_on:
+      obsidian-livesync-couchdb:
+        condition: service_healthy
+    networks:
+      - internal
+    volumes:
+      - /srv/apps/obsidian-livesync/exported_vault:/vault
+      - ./scripts/setup-livesync-cli.sh:/scripts/setup-livesync-cli.sh:ro
+      - ./scripts/export-couchdb-to-vault.sh:/scripts/export-couchdb-to-vault.sh:ro
+    environment:
+      COUCHDB_INTERNAL_URL: http://obsidian-livesync-couchdb:5984
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCHDB_DATABASE: ${COUCHDB_DATABASE}
+      LIVESYNC_PASSPHRASE: ${LIVESYNC_PASSPHRASE}
+    entrypoint: /bin/bash
+    command: /scripts/export-couchdb-to-vault.sh
+
+  # Rebuild the database from the exported vault.
+  # Run if the database needs to be rebuilt after restore.
+  # Replication will need to be performed on each client to sync with the rebuilt database.
+  rebuild-database:
+    image: ghcr.io/vrtmrz/livesync-cli:latest
+    profiles: ["manual-restore"] # run this only if needed after database volume restore
+    depends_on:
+      obsidian-livesync-couchdb:
+        condition: service_healthy
+      obsidian-livesync-couchdb-init:
+        condition: service_completed_successfully
+    networks:
+      - internal
+    volumes:
+      - /srv/apps/obsidian-livesync/exported_vault:/vault
+      - ./scripts/setup-livesync-cli.sh:/scripts/setup-livesync-cli.sh:ro
+      - ./scripts/import-vault-to-couchdb.sh:/scripts/import-vault-to-couchdb.sh:ro
+    environment:
+      COUCHDB_INTERNAL_URL: http://obsidian-livesync-couchdb:5984
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCHDB_DATABASE: ${COUCHDB_DATABASE}
+      LIVESYNC_PASSPHRASE: ${LIVESYNC_PASSPHRASE}
+    entrypoint: /bin/bash
+    command: /scripts/import-vault-to-couchdb.sh
+
+networks:
+  internal:
+    internal: true
+  reverse-proxy:
+    external: true
+    name: apps-reverse-proxy
