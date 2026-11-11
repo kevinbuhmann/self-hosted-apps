@@ -7,3 +7,13 @@ paperless.home.arpa {
   tls internal
   reverse_proxy paperless:8000
 }
+
+mindwtr.home.arpa {
+  tls internal
+  reverse_proxy mindwtr-app:5173
+}
+
+mindwtr-cloud.home.arpa {
+  tls internal
+  reverse_proxy mindwtr-cloud:8787
+}
