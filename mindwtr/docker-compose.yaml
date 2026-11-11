@@ -1,0 +1,43 @@
+services:
+  mindwtr-app:
+    image: ghcr.io/dongdongbh/mindwtr-app:latest
+    restart: unless-stopped
+    depends_on:
+      - mindwtr-cloud
+    networks:
+      - internal
+      - reverse-proxy
+    environment:
+      - MINDWTR_PWA_ENABLED=true
+      - MINDWTR_DEFAULT_CLOUD_URL=https://mindwtr-cloud.home.arpa
+
+  mindwtr-cloud:
+    image: ghcr.io/dongdongbh/mindwtr-cloud:latest
+    restart: unless-stopped
+    depends_on:
+      mindwtr-cloud-init:
+        condition: service_completed_successfully
+    networks:
+      - internal
+      - reverse-proxy
+    volumes:
+      - /srv/apps/mindwtr/mindwtr_data:/app/data
+    environment:
+      - MINDWTR_CLOUD_DATA_DIR=/app/data
+      - MINDWTR_CLOUD_CORS_ORIGIN=https://mindwtr.home.arpa
+      - MINDWTR_CLOUD_AUTH_TOKENS=${MINDWTR_CLOUD_AUTH_TOKENS}
+
+  mindwtr-cloud-init:
+    image: alpine:latest
+    user: "0:0" # run as root to fix host permissions
+    network_mode: none
+    volumes:
+      - /srv/apps/mindwtr/mindwtr_data:/app/data
+    command: chown -R 1000:1000 /app/data
+
+networks:
+  internal:
+    internal: true
+  reverse-proxy:
+    external: true
+    name: apps-reverse-proxy

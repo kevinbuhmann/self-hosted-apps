@@ -11,6 +11,8 @@ services:
         aliases:
           - cloud.home.arpa
           - paperless.home.arpa
+          - mindwtr.home.arpa
+          - mindwtr-cloud.home.arpa
           - obsidian-livesync-couchdb.home.arpa
     volumes:
       - /srv/apps/caddy/data:/data
