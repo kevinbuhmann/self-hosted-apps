@@ -1,0 +1,11 @@
+{
+  "name": "self-hosted-apps",
+  "author": "Kevin Buhmann",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "3.10.1"
+  }
+}
