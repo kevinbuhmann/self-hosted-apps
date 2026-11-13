@@ -3,8 +3,8 @@ services:
     image: couchdb:3
     restart: unless-stopped
     networks:
-      - internal
       - reverse-proxy
+      - obsidian-livesync-internal
     volumes:
       - /srv/apps/obsidian-livesync/couchdb_data:/opt/couchdb/data
     environment:
@@ -26,7 +26,7 @@ services:
       obsidian-livesync-couchdb:
         condition: service_healthy
     networks:
-      - internal
+      - obsidian-livesync-internal
     volumes:
       - ./scripts/couchdb-init.sh:/scripts/couchdb-init.sh:ro
     environment:
@@ -42,14 +42,14 @@ services:
 
   # Export the raw markdown files from CouchDB to a vault folder.
   # This ensures that the vault can be recovered even if the encrypted sync database is corrupted or unusable.
-  pre-backup:
+  obsidian-livesync-pre-backup:
     image: ghcr.io/vrtmrz/livesync-cli:latest
-    profiles: ["backup"]
+    profiles: ["pre-backup"]
     depends_on:
       obsidian-livesync-couchdb:
         condition: service_healthy
     networks:
-      - internal
+      - obsidian-livesync-internal
     volumes:
       - /srv/apps/obsidian-livesync/exported_vault:/vault
       - ./scripts/setup-livesync-cli.sh:/scripts/setup-livesync-cli.sh:ro
@@ -66,7 +66,7 @@ services:
   # Rebuild the database from the exported vault.
   # Run if the database needs to be rebuilt after restore.
   # Replication will need to be performed on each client to sync with the rebuilt database.
-  rebuild-database:
+  obsidian-livesync-rebuild-database:
     image: ghcr.io/vrtmrz/livesync-cli:latest
     profiles: ["manual-restore"] # run this only if needed after database volume restore
     depends_on:
@@ -75,7 +75,7 @@ services:
       obsidian-livesync-couchdb-init:
         condition: service_completed_successfully
     networks:
-      - internal
+      - obsidian-livesync-internal
     volumes:
       - /srv/apps/obsidian-livesync/exported_vault:/vault
       - ./scripts/setup-livesync-cli.sh:/scripts/setup-livesync-cli.sh:ro
@@ -90,8 +90,5 @@ services:
     command: /scripts/import-vault-to-couchdb.sh
 
 networks:
-  internal:
+  obsidian-livesync-internal:
     internal: true
-  reverse-proxy:
-    external: true
-    name: apps-reverse-proxy

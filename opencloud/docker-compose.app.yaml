@@ -24,8 +24,3 @@ services:
     environment:
       INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
     entrypoint: ["/bin/sh", "/scripts/opencloud-init.sh"]
-
-networks:
-  reverse-proxy:
-    external: true
-    name: apps-reverse-proxy

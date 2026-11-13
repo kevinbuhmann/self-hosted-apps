@@ -1,17 +1,17 @@
 services:
-  broker:
+  paperless-valkey:
     image: valkey/valkey:9
     restart: unless-stopped
     networks:
-      - internal
+      - paperless-internal
     volumes:
       - /srv/apps/paperless-ngx/valkey_data:/data
 
-  db:
+  paperless-postgres:
     image: postgres:18
     restart: unless-stopped
     networks:
-      - internal
+      - paperless-internal
     volumes:
       - /srv/apps/paperless-ngx/postgres_data:/var/lib/postgresql
     environment:
@@ -19,7 +19,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready --host=db --port=5432"]
+      test: ["CMD-SHELL", "pg_isready --host=localhost --port=5432"]
       interval: 1s
       timeout: 10s
       retries: 15
@@ -28,11 +28,11 @@ services:
     image: paperlessngx/paperless-ngx:3.3
     restart: unless-stopped
     depends_on:
-      - db
-      - broker
+      - paperless-valkey
+      - paperless-postgres
     networks:
-      - internal
       - reverse-proxy
+      - paperless-internal
     volumes:
       - /srv/apps/paperless-ngx/paperless_data:/usr/src/paperless/data
       - /srv/apps/paperless-ngx/paperless_media:/usr/src/paperless/media
@@ -40,10 +40,10 @@ services:
       - /srv/apps/paperless-ngx/paperless_consume:/usr/src/paperless/consume
     environment:
       # broker
-      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_REDIS: redis://paperless-valkey:6379
       # database
       PAPERLESS_DBENGINE: postgresql
-      PAPERLESS_DBHOST: db
+      PAPERLESS_DBHOST: paperless-postgres
       PAPERLESS_DBNAME: ${POSTGRES_DB}
       PAPERLESS_DBUSER: ${POSTGRES_USER}
       PAPERLESS_DBPASSWORD: ${POSTGRES_PASSWORD}
@@ -65,43 +65,40 @@ services:
   ################################# Backup Hooks #################################
   ################################################################################
 
-  pre-backup:
+  paperless-pre-backup:
     image: postgres:18
-    profiles: ["backup"]
+    profiles: ["pre-backup"]
     depends_on:
-      db:
+      paperless-postgres:
         condition: service_healthy
     networks:
-      - internal
+      - paperless-internal
     volumes:
       - /srv/apps/paperless-ngx/postgres_backup:/target
     environment:
-      PGHOST: db
+      PGHOST: paperless-postgres
       PGDATABASE: ${POSTGRES_DB}
       PGUSER: ${POSTGRES_USER}
       PGPASSWORD: ${POSTGRES_PASSWORD}
     command: pg_dump --format=tar --file=/target/paperless_db.tar
 
-  post-restore:
+  paperless-post-restore:
     image: postgres:18
-    profiles: ["restore"]
+    profiles: ["post-restore"]
     depends_on:
-      db:
+      paperless-postgres:
         condition: service_healthy
     networks:
-      - internal
+      - paperless-internal
     volumes:
       - /srv/apps/paperless-ngx/postgres_backup:/target
     environment:
-      PGHOST: db
+      PGHOST: paperless-postgres
       PGDATABASE: ${POSTGRES_DB}
       PGUSER: ${POSTGRES_USER}
       PGPASSWORD: ${POSTGRES_PASSWORD}
     command: pg_restore --clean --if-exists --exit-on-error --dbname=${POSTGRES_DB} --format=tar /target/paperless_db.tar
 
 networks:
-  internal:
+  paperless-internal:
     internal: true
-  reverse-proxy:
-    external: true
-    name: apps-reverse-proxy

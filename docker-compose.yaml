@@ -1,0 +1,10 @@
+include:
+  - path: ./caddy/docker-compose.app.yaml
+  - path: ./mindwtr/docker-compose.app.yaml
+  - path: ./obsidian-livesync/docker-compose.app.yaml
+  - path: ./opencloud/docker-compose.app.yaml
+  - path: ./paperless-ngx/docker-compose.app.yaml
+
+networks:
+  reverse-proxy:
+    internal: true

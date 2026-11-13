@@ -9,7 +9,7 @@
 
 set -e
 
-hostname="${COUCHDB_INTERNAL_URL:-http://couchdb:5984}"
+hostname="${COUCHDB_INTERNAL_URL:?COUCHDB_INTERNAL_URL is required}"
 username="${COUCHDB_USER:?COUCHDB_USER is required}"
 password="${COUCHDB_PASSWORD:?COUCHDB_PASSWORD is required}"
 node="${COUCHDB_NODE:-_local}"

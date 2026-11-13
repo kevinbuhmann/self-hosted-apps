@@ -23,9 +23,6 @@ sudo chown "$USER":"$USER" /srv/apps # set ownership for the current user
 sudo setfacl -R -m u:"$USER":rwx /srv/apps # set ACL for the current user recursively
 sudo setfacl -dR -m u:"$USER":rwx /srv/apps # set default ACL for the current user recursively
 
-# Create the reverse proxy docker network if it doesn't exist.
-docker network create apps-reverse-proxy --internal || true
-
 # Perform the restore using restic.
 echo
 restore_failed=0
@@ -36,9 +33,9 @@ if [ "$restore_failed" -ne 0 ]; then
 fi
 
 # Run post-restore hooks for all services (e.g. to restore database from backups).
-./_scripts/run-service-all.sh post-restore --profile restore
+./_scripts/run-service-all.sh post-restore
 
 # Bring all services up.
-./_scripts/compose-all.sh up -d
+docker compose up -d
 
 echo -e "\e[32mRestore succeeded and services are running.\e[0m"

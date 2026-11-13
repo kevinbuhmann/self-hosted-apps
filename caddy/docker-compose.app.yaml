@@ -25,18 +25,18 @@ services:
   ################################# Backup Hooks #################################
   ################################################################################
 
-  pre-backup:
+  caddy-pre-backup:
     image: alpine:3
-    profiles: ["backup"]
+    profiles: ["pre-backup"]
     network_mode: none
     volumes:
       - /srv/apps/caddy/data:/data
       - /srv/apps/caddy/data-backup:/data-backup
     command: tar --create --verbose --file /data-backup/caddy-data.tar --exclude locks --directory /data .
 
-  post-restore:
+  caddy-post-restore:
     image: alpine:3
-    profiles: ["restore"]
+    profiles: ["post-restore"]
     network_mode: none
     volumes:
       - /srv/apps/caddy/data:/data
@@ -45,6 +45,3 @@ services:
 
 networks:
   internet:
-  reverse-proxy:
-    external: true
-    name: apps-reverse-proxy

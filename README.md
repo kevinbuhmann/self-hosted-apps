@@ -24,17 +24,6 @@ Purpose: general files.
 
 ## Management scripts
 
-### compose-all.sh
-
-Usage: `./_scripts/compose-all.sh [args]`
-
-Runs `docker compose [args]` for each app. Useful to bring all services up or down.
-
-Examples:
-
-- `./_scripts/compose-all.sh down`
-- `./_scripts/compose-all.sh up -d`
-
 ### backup-all.sh
 
 Usage: `./_scripts/backup-all.sh`
@@ -65,9 +54,8 @@ Prerequisites:
 Script actions:
 
 1. Creates `/srv/apps` and sets owner if it doesn't exist.
-2. Creates the `apps-reverse-proxy` docker network if it doesn't exist.
-3. Runs `restic restore latest` from `RESTIC_REPO` using `RESTIC_PASSWORD_FILE`.
-4. Runs `post-restore` services under the `restore` profile (e.g. to restore database from backups).
+2. Runs `restic restore latest` from `RESTIC_REPO` using `RESTIC_PASSWORD_FILE`.
+3. Runs `post-restore` services under the `restore` profile (e.g. to restore database from backups).
 
 ### run-clone.sh
 

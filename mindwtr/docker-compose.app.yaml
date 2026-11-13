@@ -5,8 +5,8 @@ services:
     depends_on:
       - mindwtr-cloud
     networks:
-      - internal
       - reverse-proxy
+      - mindwtr-internal
     environment:
       - MINDWTR_PWA_ENABLED=true
       - MINDWTR_DEFAULT_CLOUD_URL=https://mindwtr-cloud.home.arpa
@@ -18,8 +18,8 @@ services:
       mindwtr-cloud-init:
         condition: service_completed_successfully
     networks:
-      - internal
       - reverse-proxy
+      - mindwtr-internal
     volumes:
       - /srv/apps/mindwtr/mindwtr_data:/app/data
     environment:
@@ -36,8 +36,5 @@ services:
     command: chown -R 1000:1000 /app/data
 
 networks:
-  internal:
+  mindwtr-internal:
     internal: true
-  reverse-proxy:
-    external: true
-    name: apps-reverse-proxy
