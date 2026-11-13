@@ -3,7 +3,8 @@ services:
     image: ghcr.io/dongdongbh/mindwtr-app:latest
     restart: unless-stopped
     depends_on:
-      - mindwtr-cloud
+      mindwtr-cloud:
+        condition: service_healthy
     networks:
       - reverse-proxy
       - mindwtr-internal

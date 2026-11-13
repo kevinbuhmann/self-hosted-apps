@@ -2,6 +2,9 @@ services:
   opencloud:
     image: opencloudeu/opencloud-rolling:9
     restart: unless-stopped
+    depends_on:
+      opencloud-init:
+        condition: service_completed_successfully
     user: 1000:1000
     networks:
       - reverse-proxy
@@ -12,6 +15,13 @@ services:
       OC_URL: https://cloud.${BASE_DOMAIN}
       OC_INSECURE: true # self-signed certificate
       PROXY_TLS: false
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+      start_interval: 1s
 
   opencloud-init:
     image: opencloudeu/opencloud-rolling:9
