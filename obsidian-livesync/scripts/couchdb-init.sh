@@ -4,6 +4,8 @@
 # Configures single-node cluster, auth, CORS, and size limits.
 
 # Source: https://github.com/vrtmrz/obsidian-livesync/blob/517f5c248fdd777acb657f6d70de3913ba6390aa/docker/scripts/couchdb-init.sh
+# Changes:
+# - Added authentication to the _up health check loop for subsequent runs.
 
 set -e
 
@@ -13,8 +15,8 @@ password="${COUCHDB_PASSWORD:?COUCHDB_PASSWORD is required}"
 node="${COUCHDB_NODE:-_local}"
 
 echo "==> Waiting for CouchDB at ${hostname} ..."
-# _up is publicly accessible (no auth required) — safe pre-auth wait
-until curl -sf "${hostname}/_up" 2>/dev/null | grep -q '"status":"ok"'; do
+# _up is publicly accessible only on first run, subsequent requests require auth
+until curl -sf "${hostname}/_up" 2>/dev/null --user "${username}:${password}" | grep -q '"status":"ok"'; do
     printf '.'
     sleep 2
 done
