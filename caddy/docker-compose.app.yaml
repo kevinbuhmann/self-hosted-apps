@@ -1,6 +1,9 @@
 services:
   caddy:
-    image: caddy:2
+    build:
+      context: .
+      args:
+        CLOUDFLARE_API_URL: ${CLOUDFLARE_API_URL}
     restart: unless-stopped
     ports:
       - "${HOST_IP_ADDRESS}:80:80"
@@ -21,6 +24,7 @@ services:
     environment:
       BASE_DOMAIN: ${BASE_DOMAIN}
       HOST_IP_ADDRESS: ${HOST_IP_ADDRESS:-0.0.0.0}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
 
   ################################################################################
   ################################# Backup Hooks #################################

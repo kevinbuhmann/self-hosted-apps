@@ -1,0 +1,11 @@
+{
+  "name": "acme-dns-proxy-worker",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-11-12",
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

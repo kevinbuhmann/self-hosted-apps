@@ -3,9 +3,13 @@
   "author": "Kevin Buhmann",
   "private": true,
   "scripts": {
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "deploy": "npm run deploy --workspaces --if-present"
   },
   "devDependencies": {
     "prettier": "3.10.1"
-  }
+  },
+  "workspaces": [
+    "./caddy/cloudflare-acme-dns-proxy-worker"
+  ]
 }
