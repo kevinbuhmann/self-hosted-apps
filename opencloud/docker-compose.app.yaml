@@ -9,7 +9,7 @@ services:
       - /srv/apps/opencloud/opencloud_config:/etc/opencloud
       - /srv/apps/opencloud/opencloud_data:/var/lib/opencloud
     environment:
-      OC_URL: https://cloud.home.arpa
+      OC_URL: https://cloud.${BASE_DOMAIN}
       OC_INSECURE: true # self-signed certificate
       PROXY_TLS: false
 

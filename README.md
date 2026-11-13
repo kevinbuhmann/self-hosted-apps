@@ -4,7 +4,7 @@
 
 ### Caddy
 
-Purpose: route applications as subdomains of home.arpa (e.g. paperless.home.arpa).
+Purpose: route applications as subdomains of the configured base domain (`BASE_DOMAIN` in the root `.env` file).
 
 External configuration:
 

@@ -1,9 +1,33 @@
 include:
+  # Caddy
   - path: ./caddy/docker-compose.app.yaml
+    env_file:
+      - ./.env
+      - ./caddy/.env
+
+  # Mindwtr
   - path: ./mindwtr/docker-compose.app.yaml
+    env_file:
+      - ./.env
+      - ./mindwtr/.env
+
+  # Obsidian Livesync
   - path: ./obsidian-livesync/docker-compose.app.yaml
+    env_file:
+      - ./.env
+      - ./obsidian-livesync/.env
+
+  # OpenCloud
   - path: ./opencloud/docker-compose.app.yaml
+    env_file:
+      - ./.env
+      - ./opencloud/.env
+
+  # Paperless-ngx
   - path: ./paperless-ngx/docker-compose.app.yaml
+    env_file:
+      - ./.env
+      - ./paperless-ngx/.env
 
 networks:
   reverse-proxy:

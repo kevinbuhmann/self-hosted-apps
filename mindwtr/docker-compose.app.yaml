@@ -9,7 +9,7 @@ services:
       - mindwtr-internal
     environment:
       - MINDWTR_PWA_ENABLED=true
-      - MINDWTR_DEFAULT_CLOUD_URL=https://mindwtr-cloud.home.arpa
+      - MINDWTR_DEFAULT_CLOUD_URL=https://mindwtr-cloud.${BASE_DOMAIN}
 
   mindwtr-cloud:
     image: ghcr.io/dongdongbh/mindwtr-cloud:latest
@@ -24,7 +24,7 @@ services:
       - /srv/apps/mindwtr/mindwtr_data:/app/data
     environment:
       - MINDWTR_CLOUD_DATA_DIR=/app/data
-      - MINDWTR_CLOUD_CORS_ORIGIN=https://mindwtr.home.arpa
+      - MINDWTR_CLOUD_CORS_ORIGIN=https://mindwtr.${BASE_DOMAIN}
       - MINDWTR_CLOUD_AUTH_TOKENS=${MINDWTR_CLOUD_AUTH_TOKENS}
 
   mindwtr-cloud-init:
