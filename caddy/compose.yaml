@@ -1,0 +1,6 @@
+# Entry-point compose file that loads the root .env and the app's .env file.
+include:
+  - path: compose.caddy.yaml
+    env_file:
+      - ../.env
+      - .env

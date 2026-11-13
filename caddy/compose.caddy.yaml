@@ -9,15 +9,16 @@ services:
       internet:
       reverse-proxy:
         aliases:
-          - cloud.home.arpa
-          - paperless.home.arpa
-          - mindwtr.home.arpa
-          - mindwtr-cloud.home.arpa
+          - cloud.${BASE_DOMAIN}
+          - paperless.${BASE_DOMAIN}
+          - mindwtr.${BASE_DOMAIN}
+          - mindwtr-cloud.${BASE_DOMAIN}
     volumes:
       - /srv/apps/caddy/data:/data
       - /srv/apps/caddy/config:/config
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
     environment:
+      BASE_DOMAIN: ${BASE_DOMAIN}
       HOST_IP_ADDRESS: ${HOST_IP_ADDRESS:-0.0.0.0}
 
   ################################################################################

@@ -7,7 +7,7 @@ export HOST_GID="$(id -g)"
 echo "Running backup as user: $USER"
 
 # Build the backup-restore container, exit upon failure.
-docker compose --file ./backup-restore/docker-compose.yaml --profile backup build
+docker compose --file ./backup-restore/compose.yaml --profile backup build
 
 # Run pre-backup hooks for all services before shutting them down (e.g. to run database backups).
 ./_scripts/run-service-all.sh pre-backup --profile backup
@@ -18,7 +18,7 @@ docker compose --file ./backup-restore/docker-compose.yaml --profile backup buil
 # Perform the backup using restic.
 echo
 restic_backup_failed=0
-docker compose --file ./backup-restore/docker-compose.yaml --profile backup run --rm restic-backup || restic_backup_failed=1
+docker compose --file ./backup-restore/compose.yaml --profile backup run --rm restic-backup || restic_backup_failed=1
 
 # Bring all services back up after the restic backup is complete, even if it failed.
 compose_up_failed=0

@@ -12,4 +12,4 @@ echo "Running $1 as user: $USER"
 export HOST_UID="$(id -u)"
 export HOST_GID="$(id -g)"
 
-docker compose --file ./backup-restore/docker-compose.yaml --profile $1 run --rm rclone-$1
+docker compose --file ./backup-restore/compose.yaml --profile $1 run --rm rclone-$1

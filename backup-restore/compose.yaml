@@ -1,0 +1,6 @@
+# Entry-point compose file that loads the root .env and the app's .env file.
+include:
+  - path: compose.backup-restore.yaml
+    env_file:
+      - ../.env
+      - .env

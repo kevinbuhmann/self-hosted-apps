@@ -15,7 +15,7 @@ export HOST_GID="$(id -g)"
 echo "Running restore as user: $USER"
 
 # Build the backup-restore container, exit upon failure.
-docker compose --file ./backup-restore/docker-compose.yaml --profile backup build
+docker compose --file ./backup-restore/compose.yaml --profile backup build
 
 # Create /srv/apps if it doesn't exist.
 sudo mkdir -p /srv/apps
@@ -29,7 +29,7 @@ docker network create apps-reverse-proxy --internal || true
 # Perform the restore using restic.
 echo
 restore_failed=0
-docker compose --file ./backup-restore/docker-compose.yaml --profile restore run --rm restic-restore || restore_failed=1
+docker compose --file ./backup-restore/compose.yaml --profile restore run --rm restic-restore || restore_failed=1
 
 if [ "$restore_failed" -ne 0 ]; then
   exit "$restore_failed"

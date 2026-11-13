@@ -1,0 +1,6 @@
+# Entry-point file that loads the root .env and the app's .env file.
+include:
+  - path: compose.mindwtr.yaml
+    env_file:
+      - ../.env
+      - .env

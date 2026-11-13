@@ -31,21 +31,21 @@ fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-mapfile -t docker_compose_files < <(
-  find "$ROOT_DIR" -mindepth 2 -maxdepth 2 -type f -name docker-compose.yaml ! -path "$ROOT_DIR/backup-restore/*" | sort
+mapfile -t compose_files < <(
+  find "$ROOT_DIR" -mindepth 2 -maxdepth 2 -type f -name compose.yaml ! -path "$ROOT_DIR/backup-restore/*" | sort
 )
 
-if [[ ${#docker_compose_files[@]} -eq 0 ]]; then
-  echo "No docker-compose.yaml files found under: $ROOT_DIR"
+if [[ ${#compose_files[@]} -eq 0 ]]; then
+  echo "No compose.yaml files found under: $ROOT_DIR"
   exit 1
 fi
 
 hook_ran=0
 failures=()
-for docker_compose_file in "${docker_compose_files[@]}"; do
-  docker_compose_directory="$(dirname "$docker_compose_file")"
+for compose_file in "${compose_files[@]}"; do
+  compose_directory="$(dirname "$compose_file")"
 
-  compose_args=(--file "$docker_compose_file")
+  compose_args=(--file "$compose_file")
   if [[ -n "$profile_name" ]]; then
     compose_args+=(--profile "$profile_name")
   fi
@@ -55,13 +55,13 @@ for docker_compose_file in "${docker_compose_files[@]}"; do
     hook_ran=1
 
     echo
-    echo "Running $service_name for: $docker_compose_directory"
+    echo "Running $service_name for: $compose_directory"
 
     if docker compose "${compose_args[@]}" run --rm "$service_name"; then
-      echo -e "\e[32mOK: $docker_compose_directory\e[0m"
+      echo -e "\e[32mOK: $compose_directory\e[0m"
     else
-      echo -e "\e[31mFAILED: $docker_compose_directory\e[0m" >&2
-      failures+=("$docker_compose_directory")
+      echo -e "\e[31mFAILED: $compose_directory\e[0m" >&2
+      failures+=("$compose_directory")
     fi
   fi
 done
@@ -72,10 +72,10 @@ fi
 
 if [[ ${#failures[@]} -gt 0 ]]; then
   echo
-  echo -e "\e[31mSome Docker Compose projects failed:\e[0m"
+  echo -e "\e[31mSome projects failed:\e[0m"
   printf ' - %s\n' "${failures[@]}"
   exit 1
 fi
 
 echo
-echo -e "\e[32mService $service_name completed successfully in all Docker Compose projects.\e[0m"
+echo -e "\e[32mService $service_name completed successfully in all projects.\e[0m"
