@@ -16,8 +16,9 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5984/_up", "-u", "${COUCHDB_USER}:${COUCHDB_PASSWORD}"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 15
       start_period: 30s
+      start_interval: 1s
 
   obsidian-livesync-couchdb-init:
     image: curlimages/curl:latest
