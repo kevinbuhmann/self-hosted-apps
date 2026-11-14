@@ -4,3 +4,6 @@
 
 # use database backup (via pg_dump in pre-backup hook) instead of live database files
 /srv/apps/paperless-ngx/postgres_data
+
+# exclude uneccessary logs
+/srv/apps/paperless-ngx/paperless_data/log
