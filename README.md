@@ -18,10 +18,6 @@ Purpose: document storage.
 
 Purpose: sync Obsidian notes between devices
 
-### OpenCloud
-
-Purpose: general files.
-
 ## Management scripts
 
 ### backup-all.sh

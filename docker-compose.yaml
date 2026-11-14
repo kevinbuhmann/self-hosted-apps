@@ -17,12 +17,6 @@ include:
       - ./.env
       - ./obsidian-livesync/.env
 
-  # OpenCloud
-  - path: ./opencloud/docker-compose.app.yaml
-    env_file:
-      - ./.env
-      - ./opencloud/.env
-
   # Paperless-ngx
   - path: ./paperless-ngx/docker-compose.app.yaml
     env_file:

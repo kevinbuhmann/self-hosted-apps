@@ -4,10 +4,6 @@
   }
 }
 
-cloud.{$BASE_DOMAIN} {
-  reverse_proxy opencloud:9200
-}
-
 paperless.{$BASE_DOMAIN} {
   reverse_proxy paperless:8000
 }
