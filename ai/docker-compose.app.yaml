@@ -1,0 +1,34 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    networks:
+      - chat-internal
+      - reverse-proxy
+    volumes:
+      - /srv/models/ollama:/models
+      - /srv/apps/ai/ollama_data:/root/.ollama
+    environment:
+      OLLAMA_MODELS: /models
+      OLLAMA_ORIGINS: "*"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    ports:
+      - "8080:8080"
+    networks:
+      - reverse-proxy
+      - chat-internal
+    volumes:
+      - /srv/apps/ai/open-webui_data:/app/backend/data
+    environment:
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
+
+networks:
+  chat-internal:
+    internal: true

@@ -12,6 +12,8 @@ services:
       internet:
       reverse-proxy:
         aliases:
+          - chat.${BASE_DOMAIN}
+          - ollama.${BASE_DOMAIN}
           - cloud.${BASE_DOMAIN}
           - paperless.${BASE_DOMAIN}
           - mindwtr.${BASE_DOMAIN}

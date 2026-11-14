@@ -4,6 +4,14 @@
   }
 }
 
+chat.{$BASE_DOMAIN} {
+  reverse_proxy open-webui:8080
+}
+
+ollama.{$BASE_DOMAIN} {
+  reverse_proxy ollama:11434
+}
+
 cloud.{$BASE_DOMAIN} {
   reverse_proxy opencloud:9200
 }

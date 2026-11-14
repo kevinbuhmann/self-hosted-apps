@@ -5,6 +5,12 @@ include:
       - ./.env
       - ./caddy/.env
 
+  # AI
+  - path: ./ai/docker-compose.app.yaml
+    env_file:
+      - ./.env
+      - ./ai/.env
+
   # Mindwtr
   - path: ./mindwtr/docker-compose.app.yaml
     env_file:
